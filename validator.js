@@ -245,7 +245,7 @@
 			callback && callback.call(el);
 		},
 		extendRule:function(rules){
-			extend(item,rules||{},false);
+			extend(item,rules||{});
 		}
 	};
 	validator.prototype.init.prototype = validator.prototype;
@@ -379,6 +379,7 @@
 		}else{
 			return;
 		};
+		console.log(reg)
 		return !eval(reg);
 	};
 	//ajax验证
@@ -416,7 +417,7 @@
 	};
 	//去掉换行符和首尾的空格，将/ \ ' "转义
 	function escaping(val){
-		return val.replace(/^\s+|\s+$/g,'').replace(/[\/\\'"]/g,'\$0').replace(/[\r\n]/g,'');
+		return val.replace(/^\s+|\s+$/g,'').replace(/([\/\\'"])/g,'\$1').replace(/[\r\n]/g,'');
 	};
 	//显示默认提示信息
 	function showTip(opts){
@@ -676,7 +677,7 @@
 	function show(el){
 		el && (el.style.display = 'block');
 	};
-	function extend(target,source,rewrite){
+	function extend(target,source){
 		for(var key in source){
 			target[key] = source[key];
 		};
