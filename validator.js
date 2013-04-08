@@ -271,7 +271,7 @@
 				},0);
 			});
 		};
-		if(el.type == 'select'){
+		if(el.type == 'select' || el.type == 'file'){
 			addEvent(el,'change',changeFn);
 		};
 		//
