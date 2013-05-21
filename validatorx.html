@@ -7,54 +7,97 @@
 <meta name="description" content="JavaScript,Validator" />
 <meta content="all" name="robots" />
 <title>Validator v1.0</title>
-<link href="css/validator.css" rel="stylesheet" type="text/css" />
+<link type="text/css" rel="stylesheet" href="css/validator.css"/>
+<style>
+#validator-form{ margin:50px}
+</style>
 </head>
 <body>
-<div id="container">
-<h1>表单验证测试版，欢迎各位亲测试并提出bug!</h1>
-<div class="content">
-     <form id="validator-form" method="get" action="1.php">
-	     <div class="field-item"><label for="username"><em>*</em>注册用户名：</label><input id="username" name="username" class="input-item" type="text" value="" maxlength="20" placeholder="user name"/></div>
-         <div class="field-item"><label for="password"><em>*</em>登录密码：</label><input id="password" name="password" class="input-item" type="password" maxlength="20" value="" /></div>
-	     <div class="field-item"><label for="confirm-password"><em>*</em>确认密码：</label><input id="confirm-password" class="input-item" name="confirm-password" maxlength="20" type="password" value="" /></div>
-		 <div class="field-item"><label for="age">年龄：</label><input id="age" name="age" class="input-item" type="text" value="" maxlength="3" /></div>
-		 <div class="field-item"><label for="birthday">生日：</label><input id="birthday" name="birthday" class="input-item" type="text" value="" maxlength="10" /></div>
-	     <div class="field-item"><label for="card-type">证件类型：</label><select name="card-type" id="card-type"><option value="1">身份证</option><option value="2">军人证</option></select></div>
-		 <div class="field-item"><label for="id-card">证件号码：</label><input id="id-card" type="text" name="id-card" class="input-item" value="" /></div>
-		 <div class="field-item"><label for="email"><em>*</em>电子邮箱：</label><input id="email" name="email" type="text" class="input-item" value="" /></div>
-		 <div class="field-item"><label for="qq">QQ：</label><input id="qq" name="qq" class="input-item" type="text" value="" /></div>
-		 <div class="field-item"><label for="telephone">固定电话：</label><input id="telephone" name="telephone" class="input-item" type="text" value="" maxlength="8" /></div>
-		 <div class="field-item"><label for="mobile">手机：</label><input id="mobile" name="mobile" type="text" class="input-item" value="" maxlength="11" /></div>
-		 <div class="field-item"><label for="phone"><em>*</em>联系电话：</label><input id="phone" name="phone" type="text" class="input-item" value="" maxlength="11" /></div>
-		 <div class="field-item"><label for="zip-code">邮政编码：</label><input id="zip-code" name="zip-code" class="input-item" value="" maxlength="6" /></div>
-		 <div class="field-item"><label for="ip-address">登录IP地址：</label><input id="ip-address" name="ip-address" class="input-item" type="text" value="" maxlength="15" /></div>
-		 <div class="field-item"><label for="url">个人主页：</label><input id="url" name="url" class="input-item" type="text" value="" maxlength="100" /></div>
-		 <div class="field-item"><label for="message"><em>*</em>留言：</label><textarea id="message" class="msg-box" name="message" rows="5" cols="100" max=300></textarea></div>
-		 <div class="field-item pl">您还可以输入<em id="text-counter">300</em>个字</div>
-		 <div class="field-item pl">
-		 	<input name="btnsubmit" id="btnsubmit" type="submit" value=" 确定提交 " />
-		 	<input name="reset" id="reset" type="button" value="重设" style="float:none; width:80px;height:30px"/>
-		 	<input name="del" id="del" type="button" value="删除第一项(让第一项不需要验证)" style="float:none;height:30px;padding:0 10px;"/>
-		 </div>
-     </form>	  
-</div>
-</div>
+<form id="validator-form" class="ui-form" method="get" action="">
+  <div class="field-item">
+    <label for="username"><em>*</em>注册用户名：</label>
+    <input id="username" name="username" class="input-item" type="text" value="" maxlength="20" placeholder="user name"/>
+  </div>
+  <div class="field-item">
+    <label for="password"><em>*</em>登录密码：</label>
+    <input id="password" name="password" class="input-item" type="password" maxlength="20" value="" />
+  </div>
+  <div class="field-item">
+    <label for="confirm-password"><em>*</em>确认密码：</label>
+    <input id="confirm-password" class="input-item" name="confirm-password" maxlength="20" type="password" value="" />
+  </div>
+  <div class="field-item">
+    <label for="age">年龄：</label>
+    <input id="age" name="age" class="input-item" type="text" value="" maxlength="3" />
+  </div>
+  <div class="field-item">
+    <label for="birthday">生日：</label>
+    <input id="birthday" name="birthday" class="input-item" type="text" value="" maxlength="10" />
+  </div>
+  <div class="field-item">
+    <label for="card-type">证件类型：</label>
+    <select name="card-type" id="card-type" class="select-item">
+      <option value="1">身份证</option>
+      <option value="2">军人证</option>
+    </select>
+  </div>
+  <div class="field-item">
+    <label for="id-card">证件号码：</label>
+    <input id="id-card" type="text" name="id-card" class="input-item" value="" />
+  </div>
+  <div class="field-item">
+    <label for="email"><em>*</em>电子邮箱：</label>
+    <input id="email" name="email" type="text" class="input-item" value="" />
+  </div>
+  <div class="field-item">
+    <label for="qq">QQ：</label>
+    <input id="qq" name="qq" class="input-item" type="text" value="" />
+  </div>
+  <div class="field-item">
+    <label for="telephone">固定电话：</label>
+    <input id="telephone" name="telephone" class="input-item" type="text" value="" maxlength="8" />
+  </div>
+  <div class="field-item">
+    <label for="mobile">手机：</label>
+    <input id="mobile" name="mobile" type="text" class="input-item" value="" maxlength="11" />
+  </div>
+  <div class="field-item">
+    <label for="phone"><em>*</em>联系电话：</label>
+    <input id="phone" name="phone" type="text" class="input-item" value="" maxlength="11" />
+  </div>
+  <div class="field-item">
+    <label for="zip-code">邮政编码：</label>
+    <input id="zip-code" name="zip-code" class="input-item" value="" maxlength="6" />
+  </div>
+  <div class="field-item">
+    <label for="ip-address">登录IP地址：</label>
+    <input id="ip-address" name="ip-address" class="input-item" type="text" value="" maxlength="15" />
+  </div>
+  <div class="field-item">
+    <label for="url">个人主页：</label>
+    <input id="url" name="url" class="input-item" type="text" value="" maxlength="100" />
+  </div>
+  <div class="field-item">
+    <label for="message"><em>*</em>留言：</label>
+    <textarea id="message" class="textarea-item" name="message" rows="5" cols="100" max=300></textarea>
+  </div>
+  <div class="field-item field-item-space"><span>您还可以输入<em id="text-counter">300</em>个字</span></div>
+  <div class="field-item field-item-space">
+    <input name="btnsubmit" id="btnsubmit" type="submit" value=" 确定提交 " class="btn-item"/>
+    <input name="reset" id="reset" type="button" value="重设" class="btn-item"/>
+  </div>
+  <div class="field-item field-item-space">
+  	<input name="del" id="del" type="button" value="删除第一项(让第一项不需要验证)" class="btn-item"/>
+  </div>
+</form>
 <script type="text/javascript" src="validator.js"></script>
 <script type="text/javascript">	
 	var a = validator({
-		"form": "validator-form",
-		ajaxSubmit:true,
-		beforSubmit:function(){
-			//alert("表单提交前执行的函数");
-		},
-		afterSubmit:function(){
-			alert("ajax提交后返回的数据是："+this.responseText);
-		}
+		"form": "validator-form"
 	}).add({
 	    "target": "username",
 		"rule_type": "username",
-		'action':'2.php',
-		'tips':'说点什么好呢'
+		'tips':'请输入用户名'
 	}).add({
 		"target": "password",
 		"rule_type": "password"
@@ -65,7 +108,7 @@
         'error':'你填写的密码不正确或者和原密码不同'
 	}).add({
 		"target": "age",
-		"rule_type": "number||fuck",
+		"rule_type": "number",
 		"error":'虽然这玩意儿不是必填项，但既然你填了，就把它填对吧。'
 	}).add({
 		"target": "birthday",
@@ -121,7 +164,7 @@
 		a.remove('username');
 	}
 	a.extendRule({
-		'fuck': {
+		'newRules': {
 			'rules':/\w+?/,
 			'tips': "请填写日期！格式如：“2011-09-03”",
 			'error': "您填写的日期格式不正确，正确的格式如：“2011-09-03”"
