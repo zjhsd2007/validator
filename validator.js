@@ -13,16 +13,11 @@
 		},
 		'password': {
 			'rules': /^[a-zA-Z0-9\_\-\~\!\%\*\@\#\$\&\.\(\)\[\]\{\}\<\>\?\\\/\'\"]{3,20}$/,
-			'tips' : "3~20个字符，由英文字母，数字和<a name='spChar' title='\_ \- \~ \! \% \* \@ \# \$ \& \. \( \) \[ \] \{ \} \< \> \? \\ \/ \' \"'>特殊符号<\/a>组成。",
+			'tips' : "3~20个字符，由英文字母，数字和特殊符号组成。",
 			'error' : "对不起，您填写的密码有误。"
 		},
-		'numberInt':{
-			'rules': /^[-+]?\d+$/,
-			'tips': '请输入整数字！',
-			'error': '对不起，您填写的不是整数。'
-		},
 		'number':{
-			'rules': /^[-+]?\d+(\.\d+)?$/,
+			'rules': /^[-+]?(0|[1-9]\d*)(\.\d+)?$/,
 			'tips': '请输入数字！',
 			'error': '对不起，您填写的不是数字。'
 		},
@@ -32,7 +27,7 @@
 			'error': '对不起，您填写的日期格式不正确.'
 		},
 		'money':{
-			'rules': /^(0|[1-9]\d*)(\.\d+)?$/,
+			'rules': /^[-+]?(0|[1-9]\d*)(\.\d+)?$/,
 			'tips': '请输入金额！',
 			'error': '金额格式不正确。正确格式如：“60” 或 “60.5”。'
 		},
@@ -66,11 +61,6 @@
 			'rules': /^(0|[1-9]\d?|[0-1]\d{2}|2[0-4]\d|25[0-5]).(0|[1-9]\d?|[0-1]\d{2}|2[0-4]\d|25[0-5]).(0|[1-9]\d?|[0-1]\d{2}|2[0-4]\d|25[0-5]).(0|[1-9]\d?|[0-1]\d{2}|2[0-4]\d|25[0-5])$/,
 			'tips': '请输入IP地址！',
 			'error': '对不起，您填写的IP地址格式不正确！正确的IP地址如：192.168.1.1。'
-		},
-		'currency':{
-			'rules':/^\d+(\.\d+)?$/,
-			'tips': '请输入金额！',
-			'error': '对不起，您填写的金额格式不正确！正确的金额格式如：19.00。'
 		},
 		'zip':{
 			'rules':/^[1-9]\d{5}$/,
@@ -107,19 +97,11 @@
 			'tips': '请输入身份证号码！',
 			'error': '对不起，您填写的身份证号码格式不正确！'
 		},
-		'date': {
-			'rules':/^\d{4}-\d{2}-\d{2}$/,
-			'tips': "请填写日期！格式如：“2011-09-03”",
-			'error': "您填写的日期格式不正确，正确的格式如：“2011-09-03”"
-		},
 		'empty':{
 			'rules':/^\s*$/
 		},
 		'anything':{
 			'rules':/^[\s\S]*$/
-		},
-		'charnum':{
-			'rules':/^[-\w]+$/
 		}
 	};
     
@@ -266,9 +248,10 @@
 		if(theSame){
 			addEvent(theSame,'blur',function(){
 				//由于IE绑定事件执行顺序混乱，所以用setTimeout来排序
-				setTimeout(function(){
+				/*setTimeout(function(){
 					fireEvent(el,'blur');
-				},0);
+				},0);*/
+				fireEvent(el,'blur');
 			});
 		};
 		if(el.type == 'select' || el.type == 'file'){
@@ -319,10 +302,9 @@
 					if(hasError){
 						showErrorTip(opts);
 					}else{
+						showPassTip(opts);
 						if(opts.sameTo){
 							toSame(opts);
-						}else{
-							showPassTip(opts);
 						};
 					};
 				};
@@ -379,7 +361,6 @@
 		}else{
 			return;
 		};
-		console.log(reg)
 		return !eval(reg);
 	};
 	//ajax验证
@@ -675,7 +656,7 @@
 		el && (el.style.display = 'none');
 	};
 	function show(el){
-		el && (el.style.display = 'block');
+		el && (el.style.cssText = 'inline-block;*display:inline;*zoom:1;');
 	};
 	function extend(target,source){
 		for(var key in source){
