@@ -129,14 +129,20 @@
 			this.form = form;
 			this.items = [];//存放验证项的ID
 			this.options = [];//存放验证项的所有参数
+            this.ajaxCount = 0;
 			addEvent(form,'submit',function(e){
 				var len=_this.items.length,i=0,hasError=false,flag;
 				//取消默认提交
 				preventDefault(e);
-				//执行提交前的函数，如果有的话
-				if(opts.beforeSubmit && isFunction(opts.beforeSubmit)) flag = opts.beforeSubmit();
-				//验证所有项
-				validateAll(_this.options);
+
+                //验证所有项
+                validateAll.call(_this,_this.options);
+
+                //如果有ajax验证，那么必须等到全部都有返回结果
+                if(_this.ajaxCount > 0){
+                    alert('请等待ajax验证返回结果！');
+                };
+
 				//判断是否有没有通过的项
 				for(;i<len;i++){
 					if(hasClass($(_this.items[i]),oClass['item_error'])){
@@ -144,6 +150,10 @@
 						break;
 					};
 				};
+
+                //执行提交前的函数，如果有的话
+                if(opts.beforeSubmit && isFunction(opts.beforeSubmit)) flag = opts.beforeSubmit();
+
 				//如果有没有通过验证的项
 				if(flag === false || hasError) return false;
 				//否则，选择是以ajax的形式提交，还是默认形式提交
@@ -168,12 +178,12 @@
 			if(exsit) return this;
 			this.items.push(opts.target);
 			this.options.push(opts);
-			bindHandlers(opts);
+            bindHandlers.call(this,opts);
 			return this;
 		},
 		//移除验证项
 		remove:function(el){
-			var i=0,n,len=this.options.length,element,handler,tip;
+			var i=0,n,len=this.options.length,element,handler,tip,opt;
 			for(;i<len;i++){
 				if(el === this.options[i].target){
 					n = i;
@@ -182,15 +192,22 @@
 			};
 			if(n == undefined) return this;
 			this.items.splice(n,1);
-			this.options.splice(n,1);
+			opt = this.options.splice(n,1);
 			handler = handlers.splice(n,1)[0];
 			element = $(el);
+
+            //如果删除的是一个带ajax验证的
+            if(opt.action) this.ajaxCount--;
+
 			//获取需要项的提示信息
 			tip = $$(oClass['tip'],element.parentNode,'div')[0];
+
 			//移除所有class
 			removeClass(element,oClass['item_error']+' '+oClass['item_pass']);
+
 			//移除提示信息，如果存在的话
 			tip && tip.parentNode.removeChild(tip);
+
 			//移除绑定的事件处理函数
 			removeEvent(element,'focus',handler['focusFn']);
 			removeEvent(element,'blur',handler['blurFn']);
@@ -209,6 +226,8 @@
 			};
 			//移除所有提示信息
 			hideAllTip(this.form);
+            //重置ajax计数器
+            this.ajaxCount = 0;
 		},
 		//主动触发验证
 		trigger:function(el,callback){
@@ -236,12 +255,12 @@
 	/*************************私有方法**********************************/
 	//绑定验证事件
 	function bindHandlers(opts){
-		var el = $(opts.target),defaultVal = el.getAttribute('palaceholder'), no_tip = opts.no_tip || false,theSame;
+		var el = $(opts.target),theSame;
 		if(opts.sameTo) theSame = $(opts.sameTo);
-		focusFn = focusHandler(opts);
-		blurFn = blurHandler(opts);
-		changeFn = changeHandler(opts);
-		keyupFn = keyupHandler(opts);
+		focusFn = focusHandler.call(this,opts);
+		blurFn = blurHandler.call(this,opts);
+		changeFn = changeHandler.call(this,opts);
+		keyupFn = keyupHandler.call(this,opts);
 		addEvent(el,'focus',focusFn);
 		addEvent(el,'blur',blurFn);
 		addEvent(el,'keyup',keyupFn);
@@ -275,40 +294,22 @@
 		};
 	};
 	function blurHandler(opts){
+        var _this = this;
 		return function(){
-			var el = $(opts.target),val= el.value,defaultVal = el.getAttribute('placeholder'),theSame,hasError,hasPass;
-			//如果是主动验证的，那么值为空或是默认值的时候也需要验证，而不是重置元素
-			//注意beTrigger的值的还原语句不能放在下面的ajax回调里，考虑一下同时两个主动触发ajax验证的情况
-			if(!beTrigger && (val === '' || val === defaultVal)){
-				resetItem(opts);
-			}else{
-				if(opts.beforeBlur && isFunction(opts.beforeBlur)) opts.beforeBlur(opts);
-				//如果需要ajax验证
-				if(opts.action){
-					ajaxValidate(opts,function(hasError){
-						if(!hasError){
-							showErrorTip(opts);
-						}else{
-							if(opts.sameTo){
-								toSame(opts);
-							}else{
-								showPassTip(opts);
-							};
-						};
-					});
-				}else{
-					//不需要ajax验证
-					hasError = validate(opts);
-					if(hasError){
-						showErrorTip(opts);
-					}else{
-						showPassTip(opts);
-						if(opts.sameTo){
-							toSame(opts);
-						};
-					};
-				};
-			};
+			var el = $(opts.target),val= el.value,defaultVal = el.getAttribute('placeholder'),flag = true;
+            //如果是主动验证的，那么值为空或是默认值的时候也需要验证，而不是重置元素
+            //注意beTrigger的值的还原语句不能放在下面的ajax回调里，考虑一下同时两个主动触发ajax验证的情况
+            if(!beTrigger && (val === '' || val === defaultVal)){
+                resetItem(opts);
+                return;
+            };
+            if(opts.beforeBlur && isFunction(opts.beforeBlur)) flag = opts.beforeBlur(opts);
+            if(flag === false){
+                showErrorTip(opts);
+                return;
+            };
+            validateItem.call(_this,opts);
+            if(opts.afterBlur && isFunction(opts.afterBlur)) opts.afterBlur.call(_this,opts);
 		};
 	};
 	function changeHandler(opts){
@@ -325,19 +326,40 @@
 	//表单提交时验证所有
 	function validateAll(options){
 		for(var i=0,len=options.length;i<len;i++){
-			validateItem(options[i]);
+            validateItem.call(this,options[i]);
 		};
 	};
 	//验证单个
 	function validateItem(opts){
-		var hasError,el = $(opts.target),hasPass = hasClass(el,oClass['item_pass']),isError = hasClass(el,oClass['item_error']);
-		if(hasPass || isError) return;
+		var hasError,el = $(opts.target),_this = this;
+
 		hasError = validate(opts);
 		if(hasError){
 			showErrorTip(opts);
-		}else{ 
-			var $val = el.value;
-			$val === '' ? resetItem(opts) : showPassTip(opts);
+		}else{
+            //如果需要ajax验证
+            if(opts.action){
+                _this.ajaxCount++;
+                ajaxValidate(opts,function(pass){
+                    _this.ajaxCount--;
+                    if(!pass){
+                        showErrorTip(opts);
+                    }else{
+                        if(opts.sameTo){
+                            toSame(opts);
+                        }else{
+                            showPassTip(opts);
+                        };
+                    };
+                });
+            }else{
+                //不需要ajax验证
+                if(opts.sameTo){
+                    toSame(opts);
+                }else{
+                    showPassTip(opts);
+                };
+            };
 		};
 	};
 	//重置单个
@@ -349,19 +371,20 @@
 	};
 	//验证
 	function validate(opts){
-		var el = $(opts.target),reg = '';
-		if(opts.rule_type){
-			var type = opts.rule_type, rule_item = type.match(/(\w+)/g);
-			for(var i=0;i<rule_item.length;i++){
-				type = type.replace(rule_item[i],'chk('+ item[rule_item[i]].rules +',\''+escaping(el.value)+'\')');
-			};
-			reg = type;
-		}else if(opts.rule){
-			reg = 'this.chk('+opts.rule+',\''+escaping(el.value)+'\')';
-		}else{
-			return;
-		};
-		return !eval(reg);
+		var el = $(opts.target),reg = '',valiFn = opts.valiFn,defaultValue = el.getAttribute('placeholder');
+        if(el.value === defaultValue){el.value = '';};
+        if(opts.rule_type){
+            var type = opts.rule_type, rule_item = type.match(/(\w+)/g);
+            for(var i=0;i<rule_item.length;i++){
+                type = type.replace(rule_item[i],'chk('+ item[rule_item[i]].rules +',\''+escaping(el.value)+'\')');
+            };
+            reg = type;
+        }else if(opts.rule){
+            reg = 'chk('+opts.rule+',\''+escaping(el.value)+'\')';
+        }else{
+            return;
+        };
+        return !(valiFn ? (eval(reg) && valiFn.call(el,opts) !== false) : eval(reg));
 	};
 	//ajax验证
 	function ajaxValidate(opts,callback){
@@ -396,10 +419,10 @@
 	function chk(reg,str){
 		return reg.test(str);
 	};
-	//去掉换行符和首尾的空格，将/ \ ' "转义
-	function escaping(val){
-		return val.replace(/^\s+|\s+$/g,'').replace(/([\/\\'"])/g,'\$1').replace(/[\r\n]/g,'');
-	};
+    //去掉换行符和首尾的空格，将/ \ ' "转义
+    function escaping(val){
+        return val.replace(/^\s+|\s+$/g,'').replace(/(['"])/g,function(a,b){ return '\\'+b;}).replace(/[\r\n]/g,'')
+    };
 	//显示默认提示信息
 	function showTip(opts){
 		if(opts.no_tip) return;
