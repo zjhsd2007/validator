@@ -345,19 +345,17 @@
                     if(!pass){
                         showErrorTip(opts);
                     }else{
+                        showPassTip(opts);
                         if(opts.sameTo){
                             toSame(opts);
-                        }else{
-                            showPassTip(opts);
                         };
                     };
                 });
             }else{
+                showPassTip(opts);
                 //不需要ajax验证
                 if(opts.sameTo){
                     toSame(opts);
-                }else{
-                    showPassTip(opts);
                 };
             };
 		};
@@ -423,75 +421,53 @@
     function escaping(val){
         return val.replace(/^\s+|\s+$/g,'').replace(/(['"])/g,function(a,b){ return '\\'+b;}).replace(/[\r\n]/g,'')
     };
+    function tip(opts,type){
+        var rule_type = opts.rule_type && (opts.rule_type.match(/\w+/g))[0];
+        var msg = opts[type] || item[rule_type][type] ||'', $el = $(opts.target),$tip =$$(oClass['tip'],$el.parentNode,'div')[0];
+        if(!$tip){
+            $tip = createTip();
+            $el.parentNode.appendChild($tip);
+        };
+        $tip.innerHTML = '<span>'+msg+'</span>';
+        show($tip);
+
+        switch(type){
+            case 'tips':
+                removeClass($el,oClass['item_error']+' '+oClass['item_pass']);
+                removeClass($tip,oClass['tip_error']+' '+oClass['tip_pass']);
+                break;
+            case 'error' :
+                removeClass($el,oClass['item_pass']);
+                addClass($el,oClass['item_error']);
+                removeClass($tip,oClass['tip_pass']);
+                addClass($tip,oClass['tip_error']);
+                break;
+            case 'pass':
+                removeClass($el,oClass['item_error']);
+                addClass($el,oClass['item_pass']);
+                removeClass($tip,oClass['tip_error']);
+                addClass($tip,oClass['tip_pass']);
+                break;
+        };
+
+        if(opts.no_tip) hide($tip);
+    };
 	//显示默认提示信息
 	function showTip(opts){
-		if(opts.no_tip) return;
-		var rule_type = opts.rule_type && (opts.rule_type.match(/\w+/g))[0],tip_html;
-		var msg = opts.tips || item[rule_type].tips ||'', $el = $(opts.target),$tip =$$(oClass['tip'],$el.parentNode,'div')[0];
-		removeClass($el,oClass['item_error']+' '+oClass['item_pass']);
-		if($tip){
-			$tip.innerHTML = '<span>'+msg+'</span>';
-			removeClass($tip,oClass['tip_error']+' '+oClass['tip_pass']);
-			show($tip);
-		}else{
-			tip_html = createTip();
-			tip_html.innerHTML = '<span>'+msg+'</span>';
-			$el.parentNode.appendChild(tip_html);
-		};
+        tip(opts,'tips');
 	};
 	//显示错误提示信息
 	function showErrorTip(opts){
-		if(opts.no_tip) return;
-		var rule_type = opts.rule_type && (opts.rule_type.match(/\w+/g))[0],tip_html;
-		var msg = opts.error || item[rule_type].error || '', $el = $(opts.target),$tip =$$(oClass['tip'],$el.parentNode,'div')[0];
-		removeClass($el,oClass['item_pass']);
-		addClass($el,oClass['item_error']);
-		if($tip){
-			$tip.innerHTML = '<span>'+msg+'</span>';
-			removeClass($tip,oClass['tip_pass']);
-			addClass($tip,oClass['tip_error']);
-			show($tip);
-		}else{
-			tip_html = createTip();
-			tip_html.innerHTML = '<span>'+msg+'</span>';
-			addClass(tip_html,oClass['tip_error']);
-			$el.parentNode.appendChild(tip_html);
-		};
+        tip(opts,'error');
 	};
-	//显示警告提示信息
-	function showWarnTip(opts){
-		if(opts.no_tip) return;
-		var rule_type = opts.rule_type && (opts.rule_type.match(/\w+/g))[0],tip_html;
-		var msg = opts.warn || item[rule_type].warn ||'', $el = $(opts.target),$tip =$$(oClass['tip'],$el.parentNode,'div')[0];
-		removeClass($el,oClass['item_pass']);
-		addClass($el,oClass['item_error']);
-		if($tip){
-			$tip.innerHTML = '<span>'+msg+'</span>';
-			removeClass($tip,oClass['tip_pass']);
-			addClass($tip,oClass['tip_error']);
-			show($tip);
-		}else{
-			tip_html = createTip();
-			tip_html.innerHTML = '<span>'+msg+'</span>';
-			addClass(tip_html,oClass['tip_error']);
-			$el.parentNode.appendChild(tip_html);
-		};
-	};
+
 	//显示通过验证提示信息
 	function showPassTip(opts){
-		if(opts.no_tip) return;
-		var tip_html, $el = $(opts.target),$tip =$$(oClass['tip'],$el.parentNode,'div')[0];
-		removeClass($el,oClass['item_error']);
-		addClass($el,oClass['item_pass']);
-		if($tip){
-			removeClass($tip,oClass['tip_error']);
-			addClass($tip,oClass['tip_pass']);
-			show($tip);
-		}else{
-			tip_html = createTip();
-			addClass(tip_html,oClass['tip_pass']);
-			$el.parentNode.appendChild(tip_html);
-		};
+        var $el = $(opts.target);
+        tip(opts,'pass');
+        if($el.value === ''){
+            resetItem(opts);
+        };
 	};
 	//隐藏所有提示信息
 	function hideAllTip(form){
